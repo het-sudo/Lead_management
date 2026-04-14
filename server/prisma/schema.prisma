@@ -12,3 +12,21 @@ model User {
     email String  @unique
     name  String?
 }
+
+// Technology schema 
+
+enum Tech_Stack {
+    FRONTEND
+    BACKEND
+    DATABASE
+    TOOLS
+    DATA_SCIENCE
+    LIBRARIES
+}
+
+model Technology {
+    name      String     @id
+    category  Tech_Stack
+    createdAt DateTime   @default(now())
+    isDeleted Boolean    @default(false)
+}
