@@ -53,7 +53,7 @@ export const get_all_technology = asyncHandler(
 
 export const delete_Technology = asyncHandler(
   async (req: Request, res: Response) => {
-    const { id } = req.params.id;
+    const { id } = req.params;
 
     const deleted = await techService.deleteTechnology(id);
 

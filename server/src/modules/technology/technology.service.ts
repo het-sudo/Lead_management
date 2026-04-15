@@ -46,7 +46,7 @@ export const getAllTechnology = async (limit: number, page: number) => {
 
 export const deleteTechnology = async (id: string) => {
   const exist = await prisma.technology.findUnique({
-    where: { id: id },
+    where: { id },
   });
 
   if (!exist) {
@@ -54,7 +54,7 @@ export const deleteTechnology = async (id: string) => {
   }
 
   return await prisma.technology.update({
-    where: { id: id },
+    where: { id },
     data: { isDeleted: true, deletedAt: new Date() },
   });
 };

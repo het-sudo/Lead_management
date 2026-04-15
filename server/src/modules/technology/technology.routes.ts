@@ -11,7 +11,7 @@ import validate from "express-zod-safe";
 const router = Router();
 router.post("/", validate({ body: tech_schema }), create_technology);
 router.get("/", get_all_technology);
-router.delete("/:name", delete_Technology);
+router.delete("/:id", delete_Technology);
 
 export const TechRoute: IRoute = {
   path: "/technology",
