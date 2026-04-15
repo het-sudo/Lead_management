@@ -29,4 +29,5 @@ model Technology {
     category  Tech_Stack
     createdAt DateTime   @default(now())
     isDeleted Boolean    @default(false)
+    deletedAt DateTime?
 }

@@ -4,6 +4,8 @@ import ApiError from "../../common/errors/ApiError";
 
 const prisma = new PrismaClient();
 
+// API - CREATE TECHNOLOGY
+
 export const createTechnology = async (data: Technology_input) => {
   const existingTech = await prisma.technology.findUnique({
     where: { name: data.name },
@@ -18,5 +20,14 @@ export const createTechnology = async (data: Technology_input) => {
       name: data.name,
       category: data.category,
     },
+  });
+};
+
+//API GET ALL TECHNOLOGIES
+
+export const getAllTechnology = async () => {
+  return await prisma.technology.findMany({
+    where: { isDeleted: false },
+    orderBy: { createdAt: "desc" },
   });
 };
