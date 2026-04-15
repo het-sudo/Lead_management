@@ -25,7 +25,8 @@ enum Tech_Stack {
 }
 
 model Technology {
-    name      String     @id
+    id        String     @id @default(cuid())
+    name      String     @unique
     category  Tech_Stack
     createdAt DateTime   @default(now())
     isDeleted Boolean    @default(false)
