@@ -3,7 +3,11 @@ import { logger } from "../utils/loggers.js";
 import ApiError from "../errors/ApiError.js";
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  logger.error(err.stack);
+  if (err instanceof ApiError) {
+    logger.error(err.message);
+  } else {
+    logger.error(err.stack || err);
+  }
 
   let statusCode = 500;
   let message = " Internal Server Error ";

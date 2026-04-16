@@ -3,6 +3,7 @@ import asyncHandler from "../../common/utils/asyncHandler";
 import { tech_schema } from "./technology.validator";
 import * as techService from "../technology/technology.service";
 import { ValidatedRequest } from "express-zod-safe";
+import { ApiResponse } from "../../common/utils/ApiResponse";
 
 // API - CREATE TECHNOLOGY
 
@@ -13,11 +14,11 @@ export const createTechnology = asyncHandler(
   ) => {
     const newTech = await techService.createTechnology(req.body);
 
-    res.status(201).json({
-      success: true,
-      message: "Technology Added Sucessfully",
-      data: newTech,
-    });
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, newTech, "Technology added/updated succesFully!"),
+      );
   },
 );
 
@@ -33,16 +34,13 @@ export const getTechnology = asyncHandler(
       page,
     );
 
-    res.status(200).json({
-      success: true,
-      message: "Technologies fetched successfully",
-      data: data,
-      meta: {
+    res.status(200).json(
+      new ApiResponse(200, data, "Technologies fetched successfully", {
         totalCount,
         currentPage: page,
         totalPages: Math.ceil(totalCount / limit),
-      },
-    });
+      }),
+    );
   },
 );
 
@@ -54,11 +52,7 @@ export const deleteTechnology = asyncHandler(
 
     const deleted = await techService.deleteTechnology(id);
 
-    res.status(200).json({
-      success: true,
-      message: `Deleted technology `,
-      data: deleted,
-    });
+    res.status(200).json(new ApiResponse(200, deleted, "Technology Deleted!"));
   },
 );
 

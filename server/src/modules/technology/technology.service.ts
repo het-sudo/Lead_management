@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { technologyInput } from "./technology.interface";
 import ApiError from "../../common/errors/ApiError";
+import { logger } from "../../common/utils/loggers";
 
 const prisma = new PrismaClient();
 
@@ -12,7 +13,7 @@ export const createTechnology = async (data: technologyInput) => {
   });
 
   if (existingTech && existingTech.isDeleted === false) {
-    console.log("Tech Exist!");
+    logger.warn("Technology with this name already exists");
     throw new ApiError(400, "Technology with this name already exists");
   }
 
