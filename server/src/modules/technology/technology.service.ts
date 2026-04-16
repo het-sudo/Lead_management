@@ -1,24 +1,37 @@
 import { PrismaClient } from "@prisma/client";
-import { Technology_input } from "./technology.interface";
+import { technologyInput } from "./technology.interface";
 import ApiError from "../../common/errors/ApiError";
 
 const prisma = new PrismaClient();
 
 // API - CREATE TECHNOLOGY
 
-export const createTechnology = async (data: Technology_input) => {
+export const createTechnology = async (data: technologyInput) => {
   const existingTech = await prisma.technology.findUnique({
     where: { name: data.name },
   });
 
-  if (existingTech) {
+  if (existingTech && existingTech.isDeleted === false) {
+    console.log("Tech Exist!");
     throw new ApiError(400, "Technology with this name already exists");
+  }
+
+  if (existingTech && existingTech.isDeleted === true) {
+    return await prisma.technology.update({
+      where: { id: existingTech.id },
+      data: {
+        isDeleted: false,
+        category: data.category,
+        createdAt: new Date(),
+      },
+    });
   }
 
   return await prisma.technology.create({
     data: {
       name: data.name,
       category: data.category,
+      isDeleted: false,
     },
   });
 };
@@ -28,18 +41,19 @@ export const createTechnology = async (data: Technology_input) => {
 export const getAllTechnology = async (limit: number, page: number) => {
   const skip = (page - 1) * limit;
 
-  const data = await prisma.technology.findMany({
-    take: limit,
-    skip: skip,
-    where: { isDeleted: false },
-    orderBy: { name: "asc" },
+  return Promise.all([
+    prisma.technology.findMany({
+      take: limit,
+      skip: skip,
+      where: { isDeleted: false },
+      orderBy: { name: "asc" },
+    }),
+    prisma.technology.count({
+      where: { isDeleted: false },
+    }),
+  ]).then(([data, totalCount]) => {
+    return { data, totalCount };
   });
-
-  const totalCount = await prisma.technology.count({
-    where: { isDeleted: false },
-  });
-
-  return { data, totalCount };
 };
 
 //API - DELETE

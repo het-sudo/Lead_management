@@ -1,17 +1,17 @@
 import { Router } from "express";
 import { tech_schema } from "./technology.validator";
 import {
-  create_technology,
-  delete_Technology,
-  get_all_technology,
+  createTechnology,
+  deleteTechnology,
+  getTechnology,
 } from "./technology.controller";
 import { IRoute } from "../../common/interface/route.interface";
 import validate from "express-zod-safe";
 
 const router = Router();
-router.post("/", validate({ body: tech_schema }), create_technology);
-router.get("/", get_all_technology);
-router.delete("/:id", delete_Technology);
+router.post("/", validate({ body: tech_schema }), createTechnology);
+router.get("/", getTechnology);
+router.delete("/:id", deleteTechnology);
 
 export const TechRoute: IRoute = {
   path: "/technology",

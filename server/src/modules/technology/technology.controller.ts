@@ -1,15 +1,12 @@
-import { NextFunction, Response, Request } from "express";
+import { Response, Request } from "express";
 import asyncHandler from "../../common/utils/asyncHandler";
 import { tech_schema } from "./technology.validator";
 import * as techService from "../technology/technology.service";
-import { success } from "zod";
 import { ValidatedRequest } from "express-zod-safe";
-import { da } from "zod/v4/locales";
-import { count } from "node:console";
 
 // API - CREATE TECHNOLOGY
 
-export const create_technology = asyncHandler(
+export const createTechnology = asyncHandler(
   async (
     req: ValidatedRequest<{ body: typeof tech_schema }>,
     res: Response,
@@ -26,7 +23,7 @@ export const create_technology = asyncHandler(
 
 //API - GET ALL TECHNOLOGIES
 
-export const get_all_technology = asyncHandler(
+export const getTechnology = asyncHandler(
   async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const page = parseInt(req.query.page as string) || 1;
@@ -51,7 +48,7 @@ export const get_all_technology = asyncHandler(
 
 //API - DELETE
 
-export const delete_Technology = asyncHandler(
+export const deleteTechnology = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
