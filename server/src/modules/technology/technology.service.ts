@@ -17,17 +17,6 @@ export const createTechnology = async (data: technologyInput) => {
     throw new ApiError(400, "Technology with this name already exists");
   }
 
-  if (existingTech && existingTech.isDeleted === true) {
-    return await prisma.technology.update({
-      where: { id: existingTech.id },
-      data: {
-        isDeleted: false,
-        category: data.category,
-        createdAt: new Date(),
-      },
-    });
-  }
-
   return await prisma.technology.create({
     data: {
       name: data.name,
@@ -64,7 +53,7 @@ export const deleteTechnology = async (id: string) => {
     where: { id },
   });
 
-  if (!exist) {
+  if (!exist || exist.isDeleted === true) {
     throw new ApiError(404, "Technology doesn't exist");
   }
 

@@ -15,7 +15,7 @@ model User {
 
 // Technology schema 
 
-enum Tech_Stack {
+enum Category {
     FRONTEND
     BACKEND
     DATABASE
@@ -25,10 +25,10 @@ enum Tech_Stack {
 }
 
 model Technology {
-    id        String     @id @default(cuid())
-    name      String     @unique
-    category  Tech_Stack
-    createdAt DateTime   @default(now())
-    isDeleted Boolean    @default(false)
+    id        String    @id @default(cuid())
+    name      String    @unique
+    category  Category
+    createdAt DateTime  @default(now())
+    isDeleted Boolean   @default(false)
     deletedAt DateTime?
 }

@@ -50,7 +50,7 @@ export const deleteTechnology = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const deleted = await techService.deleteTechnology(id);
+    const deleted = await techService.deleteTechnology(id as string);
 
     res.status(200).json(new ApiResponse(200, deleted, "Technology Deleted!"));
   },
