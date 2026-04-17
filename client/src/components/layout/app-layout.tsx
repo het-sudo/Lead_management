@@ -1,17 +1,22 @@
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
-import { Sidebar } from "./sidebar";
-import { Header } from "./header";
+import { AppSidebar } from "../app-sidebar";
+import { Outlet } from "react-router-dom";
 
-export function AppLayout({ children }: { children: React.ReactNode }) {
+export function AppLayout() {
   return (
     <SidebarProvider>
-      <Sidebar />
+      <AppSidebar />
 
       <SidebarInset>
-        <Header />
-
-        <main className="p-6">{children}</main>
+        <SidebarTrigger />
+        <main className="p-6">
+          <Outlet />
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

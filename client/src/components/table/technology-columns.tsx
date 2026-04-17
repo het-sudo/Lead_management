@@ -1,5 +1,3 @@
-"use client";
-
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Eye, Plus, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +13,6 @@ export type TechnologyData = {
   id: string;
   name: string;
   category: string;
-  version: string;
 };
 
 export const technologyColumns: ColumnDef<TechnologyData>[] = [
@@ -26,10 +23,6 @@ export const technologyColumns: ColumnDef<TechnologyData>[] = [
   {
     accessorKey: "category",
     header: "Category",
-  },
-  {
-    accessorKey: "version",
-    header: "Version",
   },
   {
     header: "Actions",
