@@ -1,56 +1,54 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Plus } from "lucide-react";
+import { LayoutDashboard, Code } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>Sidebar Header</SidebarMenuItem>
-        </SidebarMenu>
+        <span className="text-lg font-bold pl-3">Lead Management</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupAction>
-            <Plus /> <span className="sr-only">Add Project</span>
-          </SidebarGroupAction>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenuButton asChild isActive>
-              <a href="#">Dashboard</a>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  isActive
+                    ? "data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                    : ""
+                }
+              >
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Dashboard</span>
+              </NavLink>
             </SidebarMenuButton>
             <SidebarMenuButton asChild>
-              <a href="#">Inbox</a>
-            </SidebarMenuButton>
-            <SidebarMenuButton asChild>
-              <a href="#">Campaign</a>
-            </SidebarMenuButton>
-            <SidebarMenuButton asChild>
-              <a href="#">Contacts</a>
-            </SidebarMenuButton>
-            <SidebarMenuButton asChild>
-              <a href="#">Segments</a>
-            </SidebarMenuButton>
-            <SidebarMenuButton asChild>
-              <a href="#">Channels</a>
+              <NavLink
+                to="/technology"
+                className={({ isActive }) =>
+                  isActive
+                    ? "data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                    : ""
+                }
+              >
+                <Code className="mr-2 h-4 w-4" />
+                <span>Technology</span>
+              </NavLink>
             </SidebarMenuButton>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup />
       </SidebarContent>
-      <SidebarFooter />
     </Sidebar>
   );
 }

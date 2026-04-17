@@ -8,8 +8,14 @@
 //   );
 // }
 
-import Dashboard from "./pages/dashboard";
+import { RouterProvider } from "react-router-dom";
+import router from "./routes";
+import { AppLayout } from "@/components/layout/app-layout";
 
 export default function App() {
-  return <Dashboard />;
+  return (
+    <AppLayout>
+      <RouterProvider router={router} />
+    </AppLayout>
+  );
 }
