@@ -4,9 +4,10 @@ import {
   type TechnologyData,
 } from "../components/table/technology-columns";
 import { DataTable } from "../components/table/data-table";
+import { DialogDemo } from "@/components/dialog";
 
-function getTechnologyData(): Promise<TechnologyData[]> {
-  return Promise.resolve([
+async function getTechnologyData(): Promise<TechnologyData[]> {
+  return [
     {
       id: "1",
       name: "React",
@@ -22,7 +23,7 @@ function getTechnologyData(): Promise<TechnologyData[]> {
       name: "Prisma",
       category: "Database",
     },
-  ]);
+  ];
 }
 
 export default function Technology() {
@@ -35,6 +36,7 @@ export default function Technology() {
   return (
     <div className="space-y-4">
       <h1 className="text-3xl font-bold tracking-tight">Technologies</h1>
+      <DialogDemo />
       <DataTable columns={technologyColumns} data={data} />
     </div>
   );

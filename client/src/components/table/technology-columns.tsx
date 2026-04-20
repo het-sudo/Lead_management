@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Eye, Plus, Code } from "lucide-react";
+import { MoreHorizontal, Eye, Plus, Code, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,7 +18,18 @@ export type TechnologyData = {
 export const technologyColumns: ColumnDef<TechnologyData>[] = [
   {
     accessorKey: "name",
-    header: "Technology",
+    // header: "Technology",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "category",

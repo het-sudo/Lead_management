@@ -5,8 +5,8 @@ import {
 } from "../components/table/dashboard-columns";
 import { DataTable } from "../components/table/data-table";
 
-function getDashboardData(): Promise<DashboardData[]> {
-  return Promise.resolve([
+async function getDashboardData(): Promise<DashboardData[]> {
+  return [
     {
       id: "1",
       name: "John Doe",
@@ -25,7 +25,7 @@ function getDashboardData(): Promise<DashboardData[]> {
       email: "bob@example.com",
       status: "Qualified",
     },
-  ]);
+  ];
 }
 
 export default function Dashboard() {
