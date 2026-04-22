@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Category, PrismaClient } from "@prisma/client";
 import { technologyInput } from "./technology.interface";
 import ApiError from "../../common/errors/ApiError";
 import { logger } from "../../common/utils/loggers";
@@ -25,6 +25,7 @@ export const createTechnology = async (data: technologyInput) => {
     },
   });
 };
+//API GET CATEGORIES
 
 //API GET ALL TECHNOLOGIES
 
@@ -36,7 +37,7 @@ export const getAllTechnology = async (limit: number, page: number) => {
       take: limit,
       skip: skip,
       where: { isDeleted: false },
-      orderBy: { name: "asc" },
+      orderBy: { createdAt: "desc" },
     }),
     prisma.technology.count({
       where: { isDeleted: false },
@@ -44,6 +45,11 @@ export const getAllTechnology = async (limit: number, page: number) => {
   ]).then(([data, totalCount]) => {
     return { data, totalCount };
   });
+};
+//API - GET CATEGORIES
+
+export const getAllCategories = async () => {
+  return Object.values(Category);
 };
 
 //API - DELETE

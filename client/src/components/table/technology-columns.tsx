@@ -9,13 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export type TechnologyData = {
+export type CreateTechInput = {
   id: string;
   name: string;
   category: string;
 };
 
-export const technologyColumns: ColumnDef<TechnologyData>[] = [
+export const technologyColumns: ColumnDef<CreateTechInput>[] = [
   {
     accessorKey: "name",
     // header: "Technology",
@@ -25,7 +25,7 @@ export const technologyColumns: ColumnDef<TechnologyData>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Technology Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

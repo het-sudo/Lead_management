@@ -4,6 +4,7 @@ import { tech_schema } from "./technology.validator";
 import * as techService from "../technology/technology.service";
 import { ValidatedRequest } from "express-zod-safe";
 import { ApiResponse } from "../../common/utils/ApiResponse";
+import { Category } from "@prisma/client";
 
 // API - CREATE TECHNOLOGY
 
@@ -15,10 +16,8 @@ export const createTechnology = asyncHandler(
     const newTech = await techService.createTechnology(req.body);
 
     res
-      .status(200)
-      .json(
-        new ApiResponse(200, newTech, "Technology added/updated succesFully!"),
-      );
+      .status(201)
+      .json(new ApiResponse(201, newTech, "Technology added successfully!"));
   },
 );
 
@@ -33,7 +32,6 @@ export const getTechnology = asyncHandler(
       limit,
       page,
     );
-
     res.status(200).json(
       new ApiResponse(200, data, "Technologies fetched successfully", {
         totalCount,
@@ -41,6 +39,20 @@ export const getTechnology = asyncHandler(
         totalPages: Math.ceil(totalCount / limit),
       }),
     );
+  },
+);
+
+//API - GET ALL CATEGORIES
+
+export const getCategories = asyncHandler(
+  async (req: Request, res: Response) => {
+    const categories = await techService.getAllCategories();
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, categories, "Categories fetched successfully"),
+      );
   },
 );
 

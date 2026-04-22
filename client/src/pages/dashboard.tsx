@@ -38,7 +38,12 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-      <DataTable columns={dashboardColumns} data={data} />
+      <DataTable
+        columns={dashboardColumns}
+        data={data}
+        filterKey="name"
+        filterPlaceholder="Filter leads by name..."
+      />
     </div>
   );
 }

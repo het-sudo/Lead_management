@@ -25,10 +25,46 @@ enum Category {
 }
 
 model Technology {
-    id        String    @id @default(cuid())
-    name      String    @unique
-    category  Category
-    createdAt DateTime  @default(now())
-    isDeleted Boolean   @default(false)
-    deletedAt DateTime?
+    id         String       @id @default(cuid())
+    name       String       @unique
+    category   Category
+    createdAt  DateTime     @default(now())
+    isDeleted  Boolean      @default(false)
+    deletedAt  DateTime?
+    dev_skills dev_skills[]
+}
+
+enum Status {
+    Active
+    OnLeave
+    InActive
+}
+
+model developerTeam {
+    id                 String       @id @default(cuid())
+    developer_name     String
+    email              String       @unique
+    number             String
+    position           String
+    beforeJoinExpYear  Int?
+    beforeJoinExpMonth Int?
+    status             Status?      @default(Active)
+    relivingDate       DateTime?
+    salary             Decimal?
+    joining_date       DateTime     @default(now())
+    tech_skills        dev_skills[]
+    createdAt          DateTime     @default(now())
+    deletedAt          DateTime?
+    isDeleted          Boolean      @default(false)
+}
+
+model dev_skills {
+    id      String @id @default(cuid())
+    dev_id  String
+    tech_id String
+
+    developer  developerTeam @relation(fields: [dev_id], references: [id], onDelete: Cascade)
+    technology Technology    @relation(fields: [tech_id], references: [id], onDelete: Cascade)
+
+    @@unique([dev_id, tech_id])
 }
