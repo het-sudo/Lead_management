@@ -33,3 +33,13 @@ export const getDeveloper = asyncHandler(
     );
   },
 );
+
+export const deleteDeveloper = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const deleted = await devService.deleteDeveloper(id as string);
+
+    res.status(200).json(new ApiResponse(200, deleted, "Developer Deleted!"));
+  },
+);

@@ -3,6 +3,7 @@ import { developerInput } from "./developer.interface";
 import prisma from "../../db/prisma";
 import { logger } from "../../common/utils/loggers";
 import ApiError from "../../common/errors/ApiError";
+import { date } from "zod";
 
 //Create Developers
 
@@ -63,7 +64,7 @@ export const getDevelopers = async (limit: number, page: number) => {
     prisma.developerTeam.findMany({
       take: limit,
       skip: skip,
-      where: { isDeleted: false },
+      where: { isDeleted: false, status: "Active" },
       orderBy: { createdAt: "desc" },
       include: {
         tech_skills: {
@@ -83,5 +84,44 @@ export const getDevelopers = async (limit: number, page: number) => {
     }),
   ]).then(([data, totalCount]) => {
     return { data, totalCount };
+  });
+};
+
+//API DELETE Developers
+
+export const deleteDeveloper = async (id: string) => {
+  const exist = await prisma.developerTeam.findUnique({
+    where: { id },
+  });
+
+  if (!exist || exist.isDeleted === true || exist.relivingDate === new Date()) {
+    throw new ApiError(404, "Developer doesn't exist");
+  }
+
+  return await prisma.developerTeam.update({
+    where: { id },
+    data: {
+      isDeleted: true,
+      deletedAt: new Date(),
+      status: "InActive",
+      relivingDate: new Date(),
+    },
+  });
+};
+
+//UPDATE - Developer Api
+
+export const updateDeveloper = async (data: developerInput, id: string) => {
+  const exist = await prisma.developerTeam.findUnique({
+    where: { id },
+  });
+
+  if (!exist || exist.isDeleted === true) {
+    throw new ApiError(404, "The Data You Are Trying To Update Doesn`t Exist");
+  }
+
+  return await prisma.developerTeam.update({
+    where: { id },
+    data: {},
   });
 };
