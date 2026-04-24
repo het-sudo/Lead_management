@@ -1,45 +1,58 @@
-import { ValidatedRequest } from "express-zod-safe";
-import asyncHandler from "../../common/utils/asyncHandler";
-import { developerSchema } from "./developer.validator";
-import * as devService from "../developer/developer.service";
-import { ApiResponse } from "../../common/utils/ApiResponse";
 import { Request, Response } from "express";
+import asyncHandler from "../../common/utils/asyncHandler";
+import * as devService from "./developer.service";
+import {
+  developerSchema,
+  updateDeveloperSchema,
+  getDevelopersSchema,
+  deleteDeveloperSchema,
+} from "./developer.validator";
+import { ApiResponse } from "../../common/utils/ApiResponse";
 
-export const createDeveloper = asyncHandler(
-  async (
-    req: ValidatedRequest<{ body: typeof developerSchema }>,
-    res: Response,
-  ) => {
-    const newTech = await devService.createDeveloper(req.body);
+// CREATE
+export const createDeveloper = asyncHandler(async (req, res) => {
+  const body = developerSchema.parse(req.body);
 
-    res
-      .status(201)
-      .json(new ApiResponse(201, newTech, "Developer added successfully!"));
-  },
-);
+  const result = await devService.createDeveloper(body);
 
-export const getDeveloper = asyncHandler(
-  async (req: Request, res: Response) => {
-    const limit = parseInt(req.query.limit as string) || 10;
-    const page = parseInt(req.query.page as string) || 1;
+  res.status(201).json(new ApiResponse(201, result, "Created"));
+});
 
-    const { data, totalCount } = await devService.getDevelopers(limit, page);
-    res.status(200).json(
-      new ApiResponse(200, data, "Developers fetched successfully", {
-        totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      }),
-    );
-  },
-);
+// GET
+export const getDevelopers = asyncHandler(async (req, res) => {
+  const query = getDevelopersSchema.parse(req.query);
 
-export const deleteDeveloper = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+  const result = await devService.getDevelopers(
+    query.limit,
+    query.page,
+    query.search,
+  );
 
-    const deleted = await devService.deleteDeveloper(id as string);
+  res.status(200).json(
+    new ApiResponse(200, result.data, "Fetched", {
+      totalCount: result.totalCount,
+      currentPage: query.page,
+      totalPages: Math.ceil(result.totalCount / query.limit),
+    }),
+  );
+});
 
-    res.status(200).json(new ApiResponse(200, deleted, "Developer Deleted!"));
-  },
-);
+// DELETE
+export const deleteDeveloper = asyncHandler(async (req, res) => {
+  const { id } = deleteDeveloperSchema.parse(req.params);
+
+  const result = await devService.deleteDeveloper(id);
+
+  res.status(200).json(new ApiResponse(200, result, "Deleted"));
+});
+
+// UPDATE
+export const updateDeveloper = asyncHandler(async (req, res) => {
+  const { id } = deleteDeveloperSchema.parse(req.params);
+
+  const body = updateDeveloperSchema.parse(req.body);
+
+  const result = await devService.updateDeveloper(id, body);
+
+  res.status(200).json(new ApiResponse(200, result, "Updated"));
+});

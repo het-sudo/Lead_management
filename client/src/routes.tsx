@@ -1,15 +1,15 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import Dashboard from "./pages/dashboard";
 import Technology from "./pages/Technology";
+import Developer from "./pages/Developer";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/dashboard" replace />,
+    element: <Navigate to="/developer" replace />,
   },
   {
-    path: "/dashboard",
-    element: <Dashboard />,
+    path: "/developer",
+    element: <Developer />,
   },
   {
     path: "/technology",

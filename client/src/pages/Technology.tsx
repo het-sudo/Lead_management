@@ -172,12 +172,6 @@ export default function Technology() {
         />
 
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()

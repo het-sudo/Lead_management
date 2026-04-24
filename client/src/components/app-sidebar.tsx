@@ -34,10 +34,10 @@ export function AppSidebar() {
             </SidebarMenuButton>
             <SidebarMenuButton>
               {" "}
-              <NavLink to="/dashboard">
+              <NavLink to="/developer">
                 <div className="flex items-center gap-1">
                   <UserKey />
-                  Dashboard
+                  Developer
                 </div>
               </NavLink>
             </SidebarMenuButton>

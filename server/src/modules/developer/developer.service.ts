@@ -1,70 +1,93 @@
-import { Prisma } from "@prisma/client";
-import { developerInput } from "./developer.interface";
 import prisma from "../../db/prisma";
-import { logger } from "../../common/utils/loggers";
 import ApiError from "../../common/errors/ApiError";
-import { date } from "zod";
+import { DeveloperInput, UpdateDeveloperInput } from "./developer.interface";
+import { validateDeveloperBusinessRules } from "./developer.middleware";
 
-//Create Developers
+export const createDeveloper = async (data: DeveloperInput) => {
+  const { tech_ids, ...rest } = data;
 
-export const createDeveloper = async (data: developerInput) => {
-  const existingDev = await prisma.developerTeam.findUnique({
-    where: { email: data.email },
-  });
+  const [existingDev, techs] = await Promise.all([
+    prisma.developerTeam.findUnique({
+      where: { email: rest.email },
+    }),
+    prisma.technology.findMany({
+      where: { id: { in: tech_ids }, isDeleted: false },
+      select: { id: true },
+    }),
+  ]);
 
-  if (existingDev && existingDev.isDeleted === false) {
-    throw new ApiError(400, "Developer with this email already exists");
+  if (existingDev && !existingDev.isDeleted) {
+    throw new ApiError(400, "Developer already exists");
   }
 
-  const technologies = await prisma.technology.findMany({
-    where: {
-      id: { in: data.tech_ids },
-      isDeleted: false,
-    },
-    select: { id: true },
-  });
+  // Rehire case
+  if (existingDev && existingDev.isDeleted) {
+    validateDeveloperBusinessRules({ ...existingDev, ...rest });
 
-  if (technologies.length !== data.tech_ids.length) {
-    throw new ApiError(400, "Some technology IDs are invalid");
+    return prisma.developerTeam.update({
+      where: { id: existingDev.id },
+      data: {
+        ...rest,
+        isDeleted: false,
+        deletedAt: null,
+      },
+    });
   }
+
+  // Tech validation
+  if (techs.length !== tech_ids.length) {
+    throw new ApiError(400, "Invalid tech IDs");
+  }
+
+  if (new Set(tech_ids).size !== tech_ids.length) {
+    throw new ApiError(400, "Duplicate tech IDs");
+  }
+
+  validateDeveloperBusinessRules(rest);
 
   const developer = await prisma.developerTeam.create({
     data: {
-      developer_name: data.developer_name,
-      email: data.email,
-      number: data.number,
-      position: data.position,
-      beforeJoinExpYear: data.beforeJoinExpYear,
-      beforeJoinExpMonth: data.beforeJoinExpMonth,
-      status: data.status,
-      relivingDate: data.relivingDate,
-      salary: data.salary,
+      ...rest,
       tech_skills: {
-        create: data.tech_ids.map((id) => ({
-          technology: {
-            connect: { id },
-          },
+        create: tech_ids.map((id) => ({
+          technology: { connect: { id } },
         })),
       },
-      isDeleted: false,
+    },
+    include: {
+      tech_skills: {
+        select: {
+          tech_id: true,
+        },
+      },
     },
   });
+
   return {
     ...developer,
-    tech_ids: data.tech_ids,
   };
 };
-
-//API GET ALL Developers
-
-export const getDevelopers = async (limit: number, page: number) => {
+export const getDevelopers = async (
+  limit: number,
+  page: number,
+  search?: string,
+) => {
   const skip = (page - 1) * limit;
 
-  return Promise.all([
+  const where: any = { isDeleted: false };
+
+  if (search) {
+    where.OR = [
+      { developer_name: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
+    ];
+  }
+
+  const [data, totalCount] = await Promise.all([
     prisma.developerTeam.findMany({
       take: limit,
-      skip: skip,
-      where: { isDeleted: false, status: "Active" },
+      skip,
+      where,
       orderBy: { createdAt: "desc" },
       include: {
         tech_skills: {
@@ -79,26 +102,20 @@ export const getDevelopers = async (limit: number, page: number) => {
         },
       },
     }),
-    prisma.developerTeam.count({
-      where: { isDeleted: false },
-    }),
-  ]).then(([data, totalCount]) => {
-    return { data, totalCount };
-  });
+    prisma.developerTeam.count({ where: { isDeleted: false } }),
+  ]);
+
+  return { data, totalCount };
 };
 
-//API DELETE Developers
-
 export const deleteDeveloper = async (id: string) => {
-  const exist = await prisma.developerTeam.findUnique({
-    where: { id },
-  });
+  const exist = await prisma.developerTeam.findUnique({ where: { id } });
 
-  if (!exist || exist.isDeleted === true || exist.relivingDate === new Date()) {
-    throw new ApiError(404, "Developer doesn't exist");
-  }
+  if (!exist) throw new ApiError(404, "Not found");
 
-  return await prisma.developerTeam.update({
+  if (exist.isDeleted) return exist;
+
+  return prisma.developerTeam.update({
     where: { id },
     data: {
       isDeleted: true,
@@ -109,19 +126,79 @@ export const deleteDeveloper = async (id: string) => {
   });
 };
 
-//UPDATE - Developer Api
+export const updateDeveloper = async (
+  id: string,
+  data: UpdateDeveloperInput,
+) => {
+  if (!Object.keys(data).length) {
+    throw new ApiError(400, "No fields to update");
+  }
 
-export const updateDeveloper = async (data: developerInput, id: string) => {
   const exist = await prisma.developerTeam.findUnique({
     where: { id },
   });
 
-  if (!exist || exist.isDeleted === true) {
-    throw new ApiError(404, "The Data You Are Trying To Update Doesn`t Exist");
+  if (!exist || exist.isDeleted) {
+    throw new ApiError(404, "Developer not found");
   }
 
-  return await prisma.developerTeam.update({
-    where: { id },
-    data: {},
+  const { tech_ids, ...rest } = data;
+
+  if (tech_ids !== undefined) {
+    const techs = await prisma.technology.findMany({
+      where: { id: { in: tech_ids }, isDeleted: false },
+      select: { id: true },
+    });
+
+    if (techs.length !== tech_ids.length) {
+      throw new ApiError(400, "Invalid tech IDs");
+    }
+
+    if (new Set(tech_ids).size !== tech_ids.length) {
+      throw new ApiError(400, "Duplicate tech IDs");
+    }
+  }
+
+  const cleanData = Object.fromEntries(
+    Object.entries(rest).filter(([, v]) => v !== undefined),
+  );
+
+  validateDeveloperBusinessRules({
+    ...exist,
+    ...cleanData,
   });
+
+  if (tech_ids !== undefined) {
+    await prisma.dev_skills.deleteMany({
+      where: { dev_id: id },
+    });
+
+    if (tech_ids.length > 0) {
+      await prisma.dev_skills.createMany({
+        data: tech_ids.map((techId) => ({
+          dev_id: id,
+          tech_id: techId,
+        })),
+      });
+    }
+  }
+
+  if (!Object.keys(cleanData).length && tech_ids === undefined) {
+    throw new ApiError(400, "No valid fields to update");
+  }
+
+  const developer = await prisma.developerTeam.update({
+    where: { id },
+    data: cleanData,
+    include: {
+      tech_skills: {
+        select: {
+          tech_id: true,
+        },
+      },
+    },
+  });
+  return {
+    ...developer,
+  };
 };

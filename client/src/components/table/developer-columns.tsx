@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Eye, Trash, ArrowUpDown } from "lucide-react";
+import { MoreHorizontal, Eye, Trash, ArrowUpDown, Pen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,48 +8,56 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { GetDevelopersQuery } from "@/types/developer";
 
-export type DashboardData = {
-  id: string;
-  name: string;
-  email: string;
-  status: "New" | "Contacted" | "Qualified";
-};
-
-export const dashboardColumns: ColumnDef<DashboardData>[] = [
+export const developerColumns: ColumnDef<GetDevelopersQuery>[] = [
   {
-    accessorKey: "name",
-    // header: "Technology",
+    accessorKey: "developer_name",
+
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Technology Name
+          Developer Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
     accessorKey: "email",
     header: "Email",
+  },
+  {
+    accessorKey: "number",
+    header: "Number",
+  },
+  {
+    accessorKey: "position",
+    header: "Position",
+  },
+  {
+    accessorKey: "beforeJoinExpYear",
+    header: "EXP YEAR",
+  },
+  {
+    accessorKey: "beforeJoinExpMonth",
+    header: "EXP MONTHS",
   },
   {
     accessorKey: "status",
     header: "Status",
   },
   {
+    accessorKey: "relivingDate",
+    header: "RelivingDate",
+  },
+  {
     header: "Actions",
     id: "actions",
-    cell: ({ row }) => {
-      const lead = row.original;
-
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -60,13 +68,14 @@ export const dashboardColumns: ColumnDef<DashboardData>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(lead.id)}
-            >
+            <DropdownMenuItem>
               <Eye className="mr-2 h-4 w-4" /> View
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Trash className="mr-2 h-4 w-4" /> Delete Lead
+              <Pen className="mr-2 h-4 w-4" /> Update
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

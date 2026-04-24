@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Status } from "@prisma/client";
 
 const baseSchema = z.object({
   developer_name: z
@@ -18,8 +17,6 @@ const baseSchema = z.object({
 
   beforeJoinExpMonth: z.number().int().min(0).max(11).optional(),
 
-  status: z.nativeEnum(Status).optional(),
-
   tech_ids: z.array(z.string().cuid()).min(1),
 
   relivingDate: z.coerce.date().optional(),
@@ -34,7 +31,6 @@ export const updateDeveloperSchema = z.object({
   position: z.string().optional(),
   beforeJoinExpYear: z.number().int().min(0).optional(),
   beforeJoinExpMonth: z.number().int().min(0).max(11).optional(),
-  status: z.nativeEnum(Status).optional(),
   relivingDate: z.coerce.date().optional(),
   salary: z.coerce.number().min(0).optional(),
   tech_ids: z.array(z.string().cuid()).optional(),
@@ -49,3 +45,11 @@ export const getDevelopersSchema = z.object({
 export const deleteDeveloperSchema = z.object({
   id: z.string().cuid(),
 });
+
+export type DeveloperInput = z.infer<typeof developerSchema>;
+
+export type UpdateDeveloperInput = z.infer<typeof updateDeveloperSchema>;
+
+export type GetDevelopersQuery = z.infer<typeof getDevelopersSchema>;
+
+export type DeleteDeveloperParams = z.infer<typeof deleteDeveloperSchema>;
