@@ -1,6 +1,7 @@
-import { z } from "zod";
+import { string, z } from "zod";
 
 const baseSchema = z.object({
+  id: z.string(),
   developer_name: z
     .string()
     .min(2)
@@ -37,6 +38,7 @@ export const updateDeveloperSchema = z.object({
 });
 
 export const getDevelopersSchema = z.object({
+  id: string(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(50).default(10),
   search: z.string().optional(),

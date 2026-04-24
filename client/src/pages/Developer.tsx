@@ -20,19 +20,25 @@ import {
 import { DataTable } from "@/components/table/data-table";
 import { useDevelopers } from "@/hooks/getDev";
 import { developerColumns } from "@/components/table/developer-columns";
+import { useDeleteDeveloper } from "@/hooks/delDev";
 
 export default function Developer() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(25);
+  const [limit, setLimit] = useState(10);
 
-  const { data, totalPages } = useDevelopers(page, limit);
+  const { data, totalPages, refetch } = useDevelopers(page, limit);
+  const { deleteDev } = useDeleteDeveloper();
 
+  const handleDelete = async (id: string) => {
+    await deleteDev(id);
+    await refetch();
+  };
   return (
     <div>
-      <DataTable columns={developerColumns} data={data} />
+      <h1 className="text-3xl font-bold">Developer</h1>
 
+      <DataTable columns={developerColumns(handleDelete)} data={data} />
       <div className="flex items-center justify-between gap-4">
-        {/* LIMIT */}
         <Field orientation="horizontal" className="w-fit">
           <FieldLabel>Rows per page</FieldLabel>
 
@@ -58,7 +64,6 @@ export default function Developer() {
           </Select>
         </Field>
 
-        {/* PAGINATION */}
         <Pagination>
           <PaginationContent>
             <PaginationItem>

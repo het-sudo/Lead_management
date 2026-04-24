@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { GetDevelopersQuery } from "@/types/developer";
 
-export const developerColumns: ColumnDef<GetDevelopersQuery>[] = [
+export const developerColumns = (
+  onDelete: (id: string) => void,
+): ColumnDef<GetDevelopersQuery>[] => [
   {
     accessorKey: "developer_name",
 
@@ -57,7 +59,8 @@ export const developerColumns: ColumnDef<GetDevelopersQuery>[] = [
   {
     header: "Actions",
     id: "actions",
-    cell: () => {
+    cell: ({ row }) => {
+      const developer = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -74,7 +77,7 @@ export const developerColumns: ColumnDef<GetDevelopersQuery>[] = [
             <DropdownMenuItem>
               <Pen className="mr-2 h-4 w-4" /> Update
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDelete(developer.id)}>
               <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
