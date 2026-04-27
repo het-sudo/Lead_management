@@ -27,10 +27,12 @@ export const getTechnology = asyncHandler(
   async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const page = parseInt(req.query.page as string) || 1;
+    const search = (req.query.search as string) || "";
 
     const { data, totalCount } = await techService.getAllTechnology(
       limit,
       page,
+      search,
     );
     res.status(200).json(
       new ApiResponse(200, data, "Technologies fetched successfully", {

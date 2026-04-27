@@ -1,7 +1,7 @@
-import { string, z } from "zod";
+import { z } from "zod";
 
 const baseSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   developer_name: z
     .string()
     .min(2)
@@ -18,9 +18,11 @@ const baseSchema = z.object({
 
   beforeJoinExpMonth: z.number().int().min(0).max(11).optional(),
 
+  joining_date: z.date(),
+
   tech_ids: z.array(z.string().cuid()).min(1),
 
-  relivingDate: z.coerce.date().optional(),
+  // relivingDate: z.coerce.date().optional(),
 
   salary: z.coerce.number().min(0).optional(),
 });
@@ -38,10 +40,11 @@ export const updateDeveloperSchema = z.object({
 });
 
 export const getDevelopersSchema = z.object({
-  id: string(),
+  id: z.string(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(50).default(10),
   search: z.string().optional(),
+  joining_date: z.date(),
 });
 
 export const deleteDeveloperSchema = z.object({

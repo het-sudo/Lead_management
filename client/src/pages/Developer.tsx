@@ -21,6 +21,7 @@ import { DataTable } from "@/components/table/data-table";
 import { useDevelopers } from "@/hooks/getDev";
 import { developerColumns } from "@/components/table/developer-columns";
 import { useDeleteDeveloper } from "@/hooks/delDev";
+import { DeveloperForm } from "@/components/developer-form";
 
 export default function Developer() {
   const [page, setPage] = useState(1);
@@ -36,7 +37,9 @@ export default function Developer() {
   return (
     <div>
       <h1 className="text-3xl font-bold">Developer</h1>
-
+      <br/>
+      <DeveloperForm onSuccess={refetch} />
+      <br />
       <DataTable columns={developerColumns(handleDelete)} data={data} />
       <div className="flex items-center justify-between gap-4">
         <Field orientation="horizontal" className="w-fit">

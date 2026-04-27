@@ -53,8 +53,13 @@ export const developerColumns = (
     header: "Status",
   },
   {
-    accessorKey: "relivingDate",
-    header: "RelivingDate",
+    accessorKey: "joining_date",
+    header: "JoiningDate",
+    cell: ({ row }) => {
+      const date = row.original.joining_date;
+
+      return new Date(date).toLocaleDateString("en-IN");
+    },
   },
   {
     header: "Actions",

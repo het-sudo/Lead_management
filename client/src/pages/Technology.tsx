@@ -66,15 +66,20 @@ export default function Technology() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
   const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState("");
 
   const fetchTechnologies = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const res = await axios.get(
-        `http://localhost:8080/api/v1/technology?limit=${limit}&page=${page}`,
-      );
+      const res = await axios.get(`http://localhost:8080/api/v1/technology`, {
+        params: {
+          limit,
+          page,
+          search,
+        },
+      });
 
       const newData = res.data.data || [];
       const totalCount = res.data.meta?.totalCount || 0;
@@ -98,7 +103,7 @@ export default function Technology() {
 
   useEffect(() => {
     fetchTechnologies();
-  }, [page, limit]);
+  }, [page, limit, search]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -170,6 +175,14 @@ export default function Technology() {
           }
           className="max-w-sm"
         />
+        {/* <input
+  placeholder="Search technology..."
+  value={search}
+  onChange={(e) => {
+    setSearch(e.target.value);
+    setPage(1); // 🔥 reset page on search
+  }}
+/> */}
 
         <DropdownMenu>
           <DropdownMenuContent align="end">

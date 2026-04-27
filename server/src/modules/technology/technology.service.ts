@@ -29,18 +29,29 @@ export const createTechnology = async (data: technologyInput) => {
 
 //API GET ALL TECHNOLOGIES
 
-export const getAllTechnology = async (limit: number, page: number) => {
+export const getAllTechnology = async (
+  limit: number,
+  page: number,
+  search?: string,
+) => {
   const skip = (page - 1) * limit;
 
+  const where: any = { isDeleted: false };
+  if (search) {
+    where.name = {
+      contains: search,
+      mode: "insensitive",
+    };
+  }
   return Promise.all([
     prisma.technology.findMany({
       take: limit,
       skip: skip,
-      where: { isDeleted: false },
+      where,
       orderBy: { createdAt: "desc" },
     }),
     prisma.technology.count({
-      where: { isDeleted: false },
+      where,
     }),
   ]).then(([data, totalCount]) => {
     return { data, totalCount };
