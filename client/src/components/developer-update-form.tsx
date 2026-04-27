@@ -1,41 +1,58 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { developerSchema, type DeveloperInput } from "@/types/developer";
-import { useCreateDeveloper } from "@/hooks/createDev";
+import {
+  developerSchema,
+  type Developer,
+  type UpdateDeveloperInput,
+} from "@/types/developer";
+
 import { useTechnologies } from "@/hooks/useTechnologoies";
+import { updateDeveloper } from "@/services/devService";
 
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { CreateTechInput } from "@/types/technology";
 
-export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
-  const [open, setOpen] = useState(false);
+type Props = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  developer: UpdateDeveloperInput | null;
+  onSuccess?: () => void;
+  developer_tech: Developer | null;
+};
+
+export function UpdateForm({
+  open,
+  onOpenChange,
+  developer,
+  onSuccess,
+}: Props) {
   const [search, setSearch] = useState("");
 
-  const { data: techs, loading: techLoading } = useTechnologies(search);
+  const { data: techs = [], loading: techLoading } = useTechnologies(
+    search,
+  ) as {
+    data: CreateTechInput[];
+    loading: boolean;
+  };
 
-  const { addDeveloper, loading: createLoading } = useCreateDeveloper();
-
-  const form = useForm<DeveloperInput>({
+  const form = useForm<UpdateDeveloperInput>({
     resolver: zodResolver(developerSchema),
     defaultValues: {
       developer_name: "",
-      email: "",
-      number: "",
       position: "",
       beforeJoinExpYear: undefined,
       beforeJoinExpMonth: undefined,
-      joining_date: undefined,
       salary: undefined,
       tech_ids: [],
     },
@@ -52,6 +69,18 @@ export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
 
   const selectedTechs = watch("tech_ids") || [];
 
+  useEffect(() => {
+    if (!developer) return;
+
+    reset({
+      developer_name: developer.developer_name || "",
+      position: developer.position || "",
+      beforeJoinExpYear: developer.beforeJoinExpYear,
+      beforeJoinExpMonth: developer.beforeJoinExpMonth,
+      salary: developer.salary ? Number(developer.salary) : undefined,
+    });
+  }, [developer, reset]);
+
   const handleTechChange = (id: string, checked: boolean) => {
     if (checked) {
       setValue("tech_ids", [...selectedTechs, id]);
@@ -63,82 +92,30 @@ export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
     }
   };
 
-  const onSubmit: SubmitHandler<DeveloperInput> = async (data) => {
-    await addDeveloper(data);
+  const onSubmit: SubmitHandler<UpdateDeveloperInput> = async (data) => {
+    if (!developer?.id) return;
+
+    await updateDeveloper(developer.id, data);
+
     onSuccess?.();
     reset();
-    setOpen(false);
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Add Developer</Button>
-      </DialogTrigger>
-
-      <DialogContent className="max-w-xl">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lvh">
         <DialogHeader>
-          <DialogTitle>Add Developer</DialogTitle>
+          <DialogTitle>Update Developer</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* NAME */}
-          <div>
-            <Label>Name</Label>
-            <Input {...register("developer_name")} />
-            {errors.developer_name && (
-              <p className="text-red-500 text-sm">
-                {errors.developer_name.message}
-              </p>
-            )}
-          </div>
-
-          {/* EMAIL */}
-          <div>
-            <Label>Email</Label>
-            <Input {...register("email")} />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-
-          {/* Joining Date */}
-          <Label>Joining Date</Label>
-
-          <Input
-            type="date"
-            {...register("joining_date", {
-              valueAsDate: true,
-            })}
-          />
-
-          {/* status */}
-          <Label>Status</Label>
-
-          <Input
-            {...register("status", {
-              valueAsDate: true,
-            })}
-          />
-
-          {errors.status && (
-            <p className="text-red-500 text-sm">{errors.status.message}</p>
-          )}
-          {/* PHONE */}
-          <div>
-            <Label>Phone</Label>
-            <Input {...register("number")} />
-            {errors.number && (
-              <p className="text-red-500 text-sm">{errors.number.message}</p>
-            )}
-          </div>
-
           {/* POSITION */}
           <div>
             <Label>Position</Label>
             <Input {...register("position")} />
             {errors.position && (
-              <p className="text-red-500 text-sm">{errors.position.message}</p>
+              <p className="text-sm text-red-500">{errors.position.message}</p>
             )}
           </div>
 
@@ -152,11 +129,6 @@ export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
                   valueAsNumber: true,
                 })}
               />
-              {errors.beforeJoinExpYear && (
-                <p className="text-red-500 text-sm">
-                  {errors.beforeJoinExpYear.message}
-                </p>
-              )}
             </div>
 
             <div>
@@ -167,11 +139,6 @@ export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
                   valueAsNumber: true,
                 })}
               />
-              {errors.beforeJoinExpMonth && (
-                <p className="text-red-500 text-sm">
-                  {errors.beforeJoinExpMonth.message}
-                </p>
-              )}
             </div>
           </div>
 
@@ -184,9 +151,6 @@ export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
                 valueAsNumber: true,
               })}
             />
-            {errors.salary && (
-              <p className="text-red-500 text-sm">{errors.salary.message}</p>
-            )}
           </div>
 
           {/* TECHNOLOGIES */}
@@ -202,8 +166,6 @@ export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
             <div className="border p-2 mt-2 max-h-40 overflow-y-auto rounded">
               {techLoading ? (
                 <p className="text-sm text-gray-500">Loading...</p>
-              ) : techs.length === 0 ? (
-                <p className="text-sm text-gray-500">No results</p>
               ) : (
                 techs.map((tech) => (
                   <label key={tech.id} className="flex items-center gap-2">
@@ -220,13 +182,15 @@ export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
               )}
             </div>
 
-            {errors.tech_ids && <p className="text-red-500 text-sm"></p>}
+            {errors.tech_ids && (
+              <p className="text-sm text-red-500">{errors.tech_ids.message}</p>
+            )}
           </div>
 
-          {/* SUBMIT */}
-          <Button type="submit" disabled={createLoading}>
-            {createLoading ? "Saving..." : "Save Developer"}
-          </Button>
+          {/* BUTTON */}
+          <div className="flex justify-end">
+            <Button type="submit">Update Developer</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

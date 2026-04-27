@@ -22,6 +22,13 @@ import { useDevelopers } from "@/hooks/getDev";
 import { developerColumns } from "@/components/table/developer-columns";
 import { useDeleteDeveloper } from "@/hooks/delDev";
 import { DeveloperForm } from "@/components/developer-form";
+import { ViewDeveloperDialog } from "@/components/developer-view";
+import type {
+  Developer,
+  DeveloperInput,
+  UpdateDeveloperInput,
+} from "@/types/developer";
+import { UpdateForm } from "@/components/developer-update-form";
 
 export default function Developer() {
   const [page, setPage] = useState(1);
@@ -29,9 +36,28 @@ export default function Developer() {
   const { data, totalPages, refetch } = useDevelopers(page, limit);
   const { deleteDev } = useDeleteDeveloper();
 
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedDev, setSelectedDev] = useState<Developer | null>(null);
+
+  const handleView = (dev: DeveloperInput) => {
+    setSelectedDev(dev);
+    setViewOpen(true);
+  };
+
   const handleDelete = async (id: string) => {
+    const confirmed = window.confirm("Are you sure you want to delete?");
+    if (!confirmed) return;
     await deleteDev(id);
     await refetch();
+  };
+  const [editOpen, setEditOpen] = useState(false);
+  const [updateDev, setUpdateDev] = useState<UpdateDeveloperInput | null>(null);
+  const [developers, setDevelopers] = useState<UpdateDeveloperInput[]>([]);
+
+  const handleEdit = (id: string) => {
+    const selected = developers.find((d) => d.id === id);
+    setUpdateDev(selected);
+    setEditOpen(true);
   };
 
   return (
@@ -41,7 +67,24 @@ export default function Developer() {
       <DeveloperForm onSuccess={refetch} />
 
       <br />
-      <DataTable columns={developerColumns(handleDelete)} data={data} />
+      <DataTable
+        columns={developerColumns({
+          onView: handleView,
+          onDelete: handleDelete,
+          OnUpdate: handleEdit,
+        })}
+        data={data}
+      />
+      <ViewDeveloperDialog
+        open={viewOpen}
+        onOpenChange={setViewOpen}
+        developer={selectedDev}
+      />
+      <UpdateForm
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        developer={updateDev}
+      />
       <div className="flex items-center justify-between gap-4">
         <Field orientation="horizontal" className="w-fit">
           <FieldLabel>Rows per page</FieldLabel>

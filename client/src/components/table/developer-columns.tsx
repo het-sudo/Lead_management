@@ -8,11 +8,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { GetDevelopersQuery } from "@/types/developer";
+import type { DeveloperInput, GetDevelopersQuery } from "@/types/developer";
 
-export const developerColumns = (
-  onDelete: (id: string) => void,
-): ColumnDef<GetDevelopersQuery>[] => [
+type Props = {
+  onView: (dev: DeveloperInput) => void;
+  onDelete: (id: string) => void;
+  OnUpdate: (id: string) => void;
+};
+export const developerColumns = ({
+  onView,
+  onDelete,
+  OnUpdate,
+}: Props): ColumnDef<GetDevelopersQuery>[] => [
   {
     accessorKey: "developer_name",
 
@@ -57,7 +64,6 @@ export const developerColumns = (
     header: "JoiningDate",
     cell: ({ row }) => {
       const date = row.original.joining_date;
-
       return new Date(date).toLocaleDateString("en-IN");
     },
   },
@@ -65,7 +71,7 @@ export const developerColumns = (
     header: "Actions",
     id: "actions",
     cell: ({ row }) => {
-      const developer = row.original;
+      const dev = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -76,13 +82,13 @@ export const developerColumns = (
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" /> View
+            <DropdownMenuItem onClick={() => onView(dev)}>
+              <Eye className="mr-2 h-4 w-4" /> View Technologies
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => OnUpdate(dev.id)}>
               <Pen className="mr-2 h-4 w-4" /> Update
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(developer.id)}>
+            <DropdownMenuItem onClick={() => onDelete(dev.id)}>
               <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

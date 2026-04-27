@@ -23,14 +23,13 @@ const baseSchema = z.object({
 
   tech_ids: z.array(z.string().cuid()).min(1),
 
-  // relivingDate: z.coerce.date().optional(),
-
   salary: z.coerce.number().min(0).optional(),
 });
 
 export const developerSchema = baseSchema;
 
 export const updateDeveloperSchema = z.object({
+  id: z.string().optional(),
   developer_name: z.string().min(2).optional(),
   position: z.string().optional(),
   beforeJoinExpYear: z.number().int().min(0).optional(),
@@ -48,6 +47,17 @@ export const getDevelopersSchema = z.object({
   joining_date: z.coerce.date().optional(),
 });
 
+export const developerResponseSchema = z.object({
+  tech_skills: z.array(
+    z.object({
+      technology: z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
+    }),
+  ),
+});
+
 export const deleteDeveloperSchema = z.object({
   id: z.string().cuid(),
 });
@@ -59,3 +69,5 @@ export type UpdateDeveloperInput = z.infer<typeof updateDeveloperSchema>;
 export type GetDevelopersQuery = z.infer<typeof getDevelopersSchema>;
 
 export type DeleteDeveloperParams = z.infer<typeof deleteDeveloperSchema>;
+
+export type Developer = z.infer<typeof developerResponseSchema>;

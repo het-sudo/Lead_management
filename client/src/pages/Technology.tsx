@@ -106,6 +106,8 @@ export default function Technology() {
   }, [page, limit, search]);
 
   const handleDelete = async (id: string) => {
+    const confirmed = window.confirm("Are you sure you want to delete?");
+    if (!confirmed) return;
     try {
       await axios.delete(`http://localhost:8080/api/v1/technology/${id}`);
       fetchTechnologies();
@@ -180,7 +182,7 @@ export default function Technology() {
   value={search}
   onChange={(e) => {
     setSearch(e.target.value);
-    setPage(1); // 🔥 reset page on search
+    setPage(1); // reset page on search
   }}
 /> */}
 
