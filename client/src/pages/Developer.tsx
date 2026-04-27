@@ -26,7 +26,6 @@ import { DeveloperForm } from "@/components/developer-form";
 export default function Developer() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-
   const { data, totalPages, refetch } = useDevelopers(page, limit);
   const { deleteDev } = useDeleteDeveloper();
 
@@ -34,11 +33,13 @@ export default function Developer() {
     await deleteDev(id);
     await refetch();
   };
+
   return (
     <div>
       <h1 className="text-3xl font-bold">Developer</h1>
-      <br/>
+      <br />
       <DeveloperForm onSuccess={refetch} />
+
       <br />
       <DataTable columns={developerColumns(handleDelete)} data={data} />
       <div className="flex items-center justify-between gap-4">

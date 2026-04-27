@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function DeveloperForm({ onSuccess }: { onSuccess?: () => void }) {
+export function Updateform({ onSuccess }: { onSuccess?: () => void }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -35,17 +35,11 @@ export function DeveloperForm({ onSuccess }: { onSuccess?: () => void }) {
       position: "",
       beforeJoinExpYear: undefined,
       beforeJoinExpMonth: undefined,
-      joining_date: new Date(),
+      joining_date: undefined,
       salary: undefined,
-      status: "Active",
       tech_ids: [],
     },
   });
-
-  useEffect(() => {
-    setSearch("");
-    reset();
-  }, [open]);
 
   const {
     register,
@@ -82,7 +76,7 @@ export function DeveloperForm({ onSuccess }: { onSuccess?: () => void }) {
         <Button>Add Developer</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lvh">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle>Add Developer</DialogTitle>
         </DialogHeader>
@@ -117,10 +111,18 @@ export function DeveloperForm({ onSuccess }: { onSuccess?: () => void }) {
               valueAsDate: true,
             })}
           />
-          {errors.joining_date && (
-            <p className="text-red-500 text-sm">
-              {errors.joining_date.message}
-            </p>
+
+          {/* status */}
+          <Label>Status</Label>
+
+          <Input
+            {...register("status", {
+              valueAsDate: true,
+            })}
+          />
+
+          {errors.status && (
+            <p className="text-red-500 text-sm">{errors.status.message}</p>
           )}
           {/* PHONE */}
           <div>

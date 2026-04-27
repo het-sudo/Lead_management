@@ -24,6 +24,8 @@ const baseSchema = z.object({
 
   relivingDate: z.coerce.date().optional(),
 
+  joining_date: z.coerce.date(),
+
   salary: z.coerce.number().min(0).optional(),
 });
 
