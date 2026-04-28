@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { IRoute } from "../../common/interface/route.interface";
 import validate from "express-zod-safe";
-import { developerSchema } from "./developer.validator";
+import { developerSchema, updateDeveloperSchema } from "./developer.validator";
 import {
   createDeveloper,
   deleteDeveloper,

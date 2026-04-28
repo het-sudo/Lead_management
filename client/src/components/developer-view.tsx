@@ -4,12 +4,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Developer } from "@/types/developer";
+import type { DeveloperInput } from "@/types/developer";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  developer: Developer | null;
+  developer: DeveloperInput | null;
 };
 
 export function ViewDeveloperDialog({ open, onOpenChange, developer }: Props) {

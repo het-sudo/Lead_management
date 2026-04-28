@@ -24,19 +24,40 @@ const baseSchema = z.object({
   tech_ids: z.array(z.string().cuid()).min(1),
 
   salary: z.coerce.number().min(0).optional(),
+  relivingDate: z.coerce.date().optional(),
+  tech_skills: z
+    .array(
+      z.object({
+        technology: z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+      }),
+    )
+    .optional(),
 });
 
 export const developerSchema = baseSchema;
 
 export const updateDeveloperSchema = z.object({
   id: z.string().optional(),
-  developer_name: z.string().min(2).optional(),
   position: z.string().optional(),
   beforeJoinExpYear: z.number().int().min(0).optional(),
   beforeJoinExpMonth: z.number().int().min(0).max(11).optional(),
-  relivingDate: z.coerce.date().optional(),
+  relivingDate: z.string().nullable().optional(),
+  status: z.string().optional(),
   salary: z.coerce.number().min(0).optional(),
   tech_ids: z.array(z.string().cuid()).optional(),
+  tech_skills: z
+    .array(
+      z.object({
+        technology: z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+      }),
+    )
+    .optional(),
 });
 
 export const getDevelopersSchema = z.object({
@@ -45,17 +66,6 @@ export const getDevelopersSchema = z.object({
   limit: z.coerce.number().min(1).max(50).default(10),
   search: z.string().optional(),
   joining_date: z.coerce.date().optional(),
-});
-
-export const developerResponseSchema = z.object({
-  tech_skills: z.array(
-    z.object({
-      technology: z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-    }),
-  ),
 });
 
 export const deleteDeveloperSchema = z.object({
@@ -69,5 +79,3 @@ export type UpdateDeveloperInput = z.infer<typeof updateDeveloperSchema>;
 export type GetDevelopersQuery = z.infer<typeof getDevelopersSchema>;
 
 export type DeleteDeveloperParams = z.infer<typeof deleteDeveloperSchema>;
-
-export type Developer = z.infer<typeof developerResponseSchema>;

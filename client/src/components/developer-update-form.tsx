@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
-  developerSchema,
-  type Developer,
+  updateDeveloperSchema,
   type UpdateDeveloperInput,
 } from "@/types/developer";
 
@@ -28,7 +27,6 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   developer: UpdateDeveloperInput | null;
   onSuccess?: () => void;
-  developer_tech: Developer | null;
 };
 
 export function UpdateForm({
@@ -47,15 +45,7 @@ export function UpdateForm({
   };
 
   const form = useForm<UpdateDeveloperInput>({
-    resolver: zodResolver(developerSchema),
-    defaultValues: {
-      developer_name: "",
-      position: "",
-      beforeJoinExpYear: undefined,
-      beforeJoinExpMonth: undefined,
-      salary: undefined,
-      tech_ids: [],
-    },
+    resolver: zodResolver(updateDeveloperSchema),
   });
 
   const {
@@ -66,28 +56,75 @@ export function UpdateForm({
     reset,
     formState: { errors },
   } = form;
-
-  const selectedTechs = watch("tech_ids") || [];
+  const status = watch("status");
 
   useEffect(() => {
-    if (!developer) return;
+    if (status === "Active") {
+      setValue("relivingDate", null);
+    }
+  }, [status, setValue]);
+
+  const selectedTechs =
+    useWatch({
+      control: form.control,
+      name: "tech_ids",
+    }) || [];
+
+  useEffect(() => {
+    if (open && developer) {
+      reset();
+    }
+  }, [open, developer]);
+
+  const formatDate = (date?: string | Date | null) => {
+    if (!date) return "";
+
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) return "";
+
+    return d.toISOString().split("T")[0];
+  };
+  useEffect(() => {
+    if (!developer) {
+      reset();
+      return;
+    }
+
+    const technologies = developer as UpdateDeveloperInput;
+
+    let techIds = developer.tech_ids || [];
+    if (!techIds.length && technologies.tech_skills) {
+      techIds = technologies.tech_skills
+        .map((skill) => skill.technology?.id || "")
+        .filter(Boolean);
+    }
 
     reset({
-      developer_name: developer.developer_name || "",
-      position: developer.position || "",
+      position: developer.position,
+      status: developer.status,
       beforeJoinExpYear: developer.beforeJoinExpYear,
       beforeJoinExpMonth: developer.beforeJoinExpMonth,
-      salary: developer.salary ? Number(developer.salary) : undefined,
+      salary: developer.salary,
+      relivingDate: formatDate(developer.relivingDate),
+      tech_ids: techIds,
     });
   }, [developer, reset]);
 
   const handleTechChange = (id: string, checked: boolean) => {
+    const current = selectedTechs || [];
+
     if (checked) {
-      setValue("tech_ids", [...selectedTechs, id]);
+      if (!current.includes(id)) {
+        setValue("tech_ids", [...current, id], {
+          shouldValidate: true,
+        });
+      }
     } else {
       setValue(
         "tech_ids",
-        selectedTechs.filter((t) => t !== id),
+        current.filter((t) => t !== id),
+        { shouldValidate: true },
       );
     }
   };
@@ -96,7 +133,7 @@ export function UpdateForm({
     if (!developer?.id) return;
 
     await updateDeveloper(developer.id, data);
-
+    // console.log(developer.tech_ids, developer.tech_skills);
     onSuccess?.();
     reset();
     onOpenChange(false);
@@ -119,6 +156,22 @@ export function UpdateForm({
             )}
           </div>
 
+          {/* STATUS */}
+          <div>
+            <Label>Status</Label>
+            <select
+              {...register("status")}
+              className="w-full border rounded px-2 py-2"
+            >
+              <option value="Active">Active</option>
+              <option value="InActive">Inactive</option>
+              <option value="OnLeave">On Leave</option>
+            </select>
+            {errors.status && (
+              <p className="text-sm text-red-500">{errors.status.message}</p>
+            )}
+          </div>
+
           {/* EXPERIENCE */}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -129,6 +182,11 @@ export function UpdateForm({
                   valueAsNumber: true,
                 })}
               />
+              {errors.beforeJoinExpYear && (
+                <p className="text-sm text-red-500">
+                  {errors.beforeJoinExpYear.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -139,6 +197,11 @@ export function UpdateForm({
                   valueAsNumber: true,
                 })}
               />
+              {errors.beforeJoinExpMonth && (
+                <p className="text-sm text-red-500">
+                  {errors.beforeJoinExpMonth.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -151,6 +214,28 @@ export function UpdateForm({
                 valueAsNumber: true,
               })}
             />
+            {errors.salary && (
+              <p className="text-sm text-red-500">{errors.salary.message}</p>
+            )}
+          </div>
+
+          {/* RELIEVING DATE */}
+          <div>
+            <Label>Relieving Date</Label>
+            <Input
+              type="date"
+              {...register("relivingDate", {
+                setValueAs: (value) => {
+                  if (value === "") return null;
+                  return value;
+                },
+              })}
+            />
+            {errors.relivingDate && (
+              <p className="text-sm text-red-500">
+                {errors.relivingDate.message}
+              </p>
+            )}
           </div>
 
           {/* TECHNOLOGIES */}

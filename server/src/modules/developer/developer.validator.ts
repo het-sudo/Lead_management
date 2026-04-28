@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Status } from "@prisma/client";
 
 const baseSchema = z.object({
+  id: z.string().optional(),
   developer_name: z
     .string()
     .min(2)
@@ -32,7 +33,7 @@ const baseSchema = z.object({
 export const developerSchema = baseSchema;
 
 export const updateDeveloperSchema = z.object({
-  developer_name: z.string().min(2).optional(),
+  id: z.string().optional(),
   position: z.string().optional(),
   beforeJoinExpYear: z.number().int().min(0).optional(),
   beforeJoinExpMonth: z.number().int().min(0).max(11).optional(),

@@ -142,6 +142,9 @@ export const updateDeveloper = async (
     throw new ApiError(404, "Developer not found");
   }
 
+  if (data.status === "Active") {
+    data.relivingDate = null;
+  }
   const { tech_ids, ...rest } = data;
 
   if (tech_ids !== undefined) {

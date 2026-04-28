@@ -23,11 +23,7 @@ import { developerColumns } from "@/components/table/developer-columns";
 import { useDeleteDeveloper } from "@/hooks/delDev";
 import { DeveloperForm } from "@/components/developer-form";
 import { ViewDeveloperDialog } from "@/components/developer-view";
-import type {
-  Developer,
-  DeveloperInput,
-  UpdateDeveloperInput,
-} from "@/types/developer";
+import type { DeveloperInput, UpdateDeveloperInput } from "@/types/developer";
 import { UpdateForm } from "@/components/developer-update-form";
 
 export default function Developer() {
@@ -37,7 +33,7 @@ export default function Developer() {
   const { deleteDev } = useDeleteDeveloper();
 
   const [viewOpen, setViewOpen] = useState(false);
-  const [selectedDev, setSelectedDev] = useState<Developer | null>(null);
+  const [selectedDev, setSelectedDev] = useState<DeveloperInput | null>(null);
 
   const handleView = (dev: DeveloperInput) => {
     setSelectedDev(dev);
@@ -50,14 +46,19 @@ export default function Developer() {
     await deleteDev(id);
     await refetch();
   };
+
   const [editOpen, setEditOpen] = useState(false);
   const [updateDev, setUpdateDev] = useState<UpdateDeveloperInput | null>(null);
-  const [developers, setDevelopers] = useState<UpdateDeveloperInput[]>([]);
 
-  const handleEdit = (id: string) => {
-    const selected = developers.find((d) => d.id === id);
-    setUpdateDev(selected);
-    setEditOpen(true);
+  const handleEdit = async (id: string) => {
+    const selected = data.find((d) => d.id === id) as
+      | UpdateDeveloperInput
+      | undefined;
+    if (selected) {
+      setUpdateDev(selected);
+      setEditOpen(true);
+      await refetch();
+    }
   };
 
   return (
@@ -84,6 +85,7 @@ export default function Developer() {
         open={editOpen}
         onOpenChange={setEditOpen}
         developer={updateDev}
+        onSuccess={refetch}
       />
       <div className="flex items-center justify-between gap-4">
         <Field orientation="horizontal" className="w-fit">
