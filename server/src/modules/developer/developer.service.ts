@@ -22,7 +22,17 @@ export const createDeveloper = async (data: DeveloperInput) => {
 
   // Rehire case
   if (existingDev && existingDev.isDeleted) {
-    validateDeveloperBusinessRules({ ...existingDev, ...rest });
+    // validateDeveloperBusinessRules({ ...existingDev, ...rest });
+    const rehireValidation: any = {
+      ...existingDev,
+      ...rest,
+    };
+
+    if (rehireValidation.status === "Active") {
+      delete rehireValidation.relivingDate;
+    }
+
+    validateDeveloperBusinessRules(rehireValidation);
 
     return prisma.developerTeam.update({
       where: { id: existingDev.id },
@@ -143,7 +153,7 @@ export const updateDeveloper = async (
   }
 
   if (data.status === "Active") {
-    data.relivingDate = null;
+    data.relivingDate = undefined;
   }
   const { tech_ids, ...rest } = data;
 
@@ -166,10 +176,20 @@ export const updateDeveloper = async (
     Object.entries(rest).filter(([, v]) => v !== undefined),
   );
 
-  validateDeveloperBusinessRules({
+  // validateDeveloperBusinessRules({
+  //   ...exist,
+  //   ...cleanData,
+  // });
+  const validationData: any = {
     ...exist,
     ...cleanData,
-  });
+  };
+
+  if (validationData.status === "Active") {
+    delete validationData.relivingDate;
+  }
+
+  validateDeveloperBusinessRules(validationData);
 
   if (tech_ids !== undefined) {
     await prisma.dev_skills.deleteMany({

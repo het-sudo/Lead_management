@@ -25,6 +25,7 @@ const baseSchema = z.object({
 
   salary: z.coerce.number().min(0).optional(),
   relivingDate: z.coerce.date().optional(),
+  // relivingDate: z.string().nullable().optional(),
   tech_skills: z
     .array(
       z.object({

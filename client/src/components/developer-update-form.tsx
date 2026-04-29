@@ -60,7 +60,7 @@ export function UpdateForm({
 
   useEffect(() => {
     if (status === "Active") {
-      setValue("relivingDate", null);
+      setValue("relivingDate", "");
     }
   }, [status, setValue]);
 

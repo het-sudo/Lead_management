@@ -29,9 +29,9 @@ export const validateDeveloperBusinessRules = (data: any) => {
   }
 
   // Status rules
-  // if (data.status === "Active" && data.relivingDate) {
-  //   throw new ApiError(400, "Active dev cannot have relieving date");
-  // }
+  if (data.status === "Active" && data.relivingDate) {
+    throw new ApiError(400, "Active dev cannot have relieving date");
+  }
 
   if (data.status === "InActive" && !data.relivingDate) {
     throw new ApiError(400, "Relieving date required for inactive status");
