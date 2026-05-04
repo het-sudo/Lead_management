@@ -60,7 +60,7 @@ export function UpdateForm({
 
   useEffect(() => {
     if (status === "Active") {
-      setValue("relivingDate", "");
+      setValue("relivingDate", null);
     }
   }, [status, setValue]);
 
@@ -85,6 +85,7 @@ export function UpdateForm({
 
     return d.toISOString().split("T")[0];
   };
+
   useEffect(() => {
     if (!developer) {
       reset();
@@ -238,7 +239,7 @@ export function UpdateForm({
             )}
           </div>
 
-          {/* TECHNOLOGIES */}
+          {/* TECHNOLOGIES m e r n j t n g s */}
           <div>
             <Label>Technologies</Label>
 

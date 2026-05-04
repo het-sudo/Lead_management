@@ -31,9 +31,8 @@ export function AppSidebar() {
                   Technology
                 </div>
               </NavLink>
-            </SidebarMenuButton>
+            </SidebarMenuButton>{" "}
             <SidebarMenuButton>
-              {" "}
               <NavLink to="/developer">
                 <div className="flex items-center gap-1">
                   <UserKey />

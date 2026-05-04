@@ -42,7 +42,7 @@ export const developerSchema = baseSchema;
 
 export const updateDeveloperSchema = z.object({
   id: z.string().optional(),
-  position: z.string().optional(),
+  position: z.string().min(2).max(50),
   beforeJoinExpYear: z.number().int().min(0).optional(),
   beforeJoinExpMonth: z.number().int().min(0).max(11).optional(),
   relivingDate: z.string().nullable().optional(),
